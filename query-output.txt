@@ -1,0 +1,29 @@
+You are now connected to database "nc_news_test" as user "jakeheath".
+You are now connected to database "nc_news" as user "jakeheath".
+                 List of relations
+ Schema |         Name         | Type  |   Owner   
+--------+----------------------+-------+-----------
+ public | articles             | table | jakeheath
+ public | comments             | table | jakeheath
+ public | knex_migrations      | table | jakeheath
+ public | knex_migrations_lock | table | jakeheath
+ public | topics               | table | jakeheath
+ public | users                | table | jakeheath
+(6 rows)
+
+ slug | description 
+------+-------------
+(0 rows)
+
+ comment_id | author | article_id | votes | created_at | body 
+------------+--------+------------+-------+------------+------
+(0 rows)
+
+ username | avatar_url | name 
+----------+------------+------
+(0 rows)
+
+ article_id | title | body | votes | topic | author | created_at 
+------------+-------+------+-------+-------+--------+------------
+(0 rows)
+
