@@ -8,19 +8,24 @@ const {
 const { formatDates, formatComments, makeRefObj } = require("../utils/utils");
 
 exports.seed = function(knex) {
-  const topicsInsertions = knex("topics")
-    .insert(topicData)
-    .returning("*");
+  return knex.migrate
+    .rollback()
+    .then(function() {
+      return knex.migrate.latest();
+    })
+    .then(function() {
+      const topicsInsertions = knex("topics").insert(topicData);
 
-  const usersInsertions = knex("users")
-    .insert(userData)
-    .returning("*");
+      const usersInsertions = knex("users").insert(userData);
 
-  return Promise.all([topicsInsertions, usersInsertions])
-    .then(function([topicsInsertions, usersInsertions]) {
-      const articlesInsertions = knex("articles")
-        .insert(articleData)
-        .returning("*");
+      return Promise.all([topicsInsertions, usersInsertions]).then(function() {
+        const formattedArticles = formatDates(articleData);
+
+        return knex
+          .insert(formattedArticles)
+          .into("articles")
+          .returning("*");
+      });
 
       /* 
       
@@ -33,7 +38,7 @@ exports.seed = function(knex) {
     })
     .then(function(articleRows) {
       /* 
-
+      
       Your comment data is currently in the incorrect format and will violate your SQL schema. 
 
       Keys need renaming, values need changing, and most annoyingly, your comments currently only refer to the title of the article they belong to, not the id. 
@@ -42,7 +47,9 @@ exports.seed = function(knex) {
       */
 
       const articleRef = makeRefObj(articleRows);
+
       const formattedComments = formatComments(commentData, articleRef);
+
       return knex("comments").insert(formattedComments);
     });
 };

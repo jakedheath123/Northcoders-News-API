@@ -12,7 +12,8 @@
     "seed-test": "npm run setup-dbs && NODE_ENV=test knex seed:run",
     "seed": "npm run migrate-rollback && npm run migrate-latest && knex seed:run",
     "test-utils": "jest spec/utils.spec.js",
-    "test": "jest spec/app.spec.js && npm run query-db"
+    "test": "jest spec/app.spec.js && npm run query-db",
+    "dev": "nodemon listen.js"
   },
   "repository": {
     "type": "git",
@@ -26,9 +27,13 @@
   },
   "homepage": "https://github.com/northcoders/be-nc-news#readme",
   "dependencies": {
+    "express": "^4.17.1",
     "jest": "^25.1.0",
     "knex": "^0.20.10",
-    "pg": "^7.18.2"
+    "pg": "^7.18.2",
+    "supertest": "^4.0.2"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  }
 }
