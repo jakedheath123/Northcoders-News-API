@@ -115,8 +115,8 @@ describe("makeRefObj", function() {
     const input = [
       { article_id: 1, title: "A" },
       { article_id: 2, title: "B" },
-      { comment_id: 3, title: "C" },
-      { comment_id: 4, title: "D" },
+      { article_id: 3, title: "C" },
+      { article_id: 4, title: "D" },
       { article_id: 5, title: "E" }
     ];
 
@@ -143,4 +143,133 @@ describe("makeRefObj", function() {
   });
 });
 
-describe("formatComments", function() {});
+describe("formatComments", function() {
+  test("Returns an empty array when passed an empty array", function() {
+    const input = [];
+    const expected = [];
+    const actual = formatComments(input);
+
+    expect(actual).toEqual(expected);
+  });
+  test("Returns a new array of one object with formatted comments when passed an array of one object and a reference object", function() {
+    const input = [
+      {
+        body:
+          "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+        belongs_to: "They're not exactly dogs, are they?",
+        created_by: "butter_bridge",
+        votes: 16,
+        created_at: 1511354163389
+      }
+    ];
+
+    const referenceObject = {
+      "They're not exactly dogs, are they?": 1
+    };
+
+    const actual = formatComments(input, referenceObject);
+
+    expect(actual[0]).toHaveProperty(
+      "body",
+      "article_id",
+      "author",
+      "votes",
+      "created_at"
+    );
+    expect(actual[0].created_at instanceof Date).toBe(true);
+  });
+  test("Returns a new array of more than one object with formatted comments when passed an array of one object and a reference object", function() {
+    const input = [
+      {
+        body:
+          "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+        belongs_to: "They're not exactly dogs, are they?",
+        created_by: "butter_bridge",
+        votes: 16,
+        created_at: 1511354163389
+      },
+      {
+        body:
+          "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
+        belongs_to: "Living in the shadow of a great man",
+        created_by: "butter_bridge",
+        votes: 14,
+        created_at: 1479818163389
+      },
+      {
+        body:
+          "Replacing the quiet elegance of the dark suit and tie with the casual indifference of these muted earth tones is a form of fashion suicide, but, uh, call me crazy — onyou it works.",
+        belongs_to: "Hello Magazine",
+        created_by: "icellusedkars",
+        votes: 100,
+        created_at: 1448282163389
+      }
+    ];
+
+    const referenceObject = {
+      "They're not exactly dogs, are they?": 1,
+      "Living in the shadow of a great man": 2,
+      "Hello Magazine": 3
+    };
+
+    const actual = formatComments(input, referenceObject);
+
+    expect(actual[0]).toHaveProperty(
+      "body",
+      "article_id",
+      "author",
+      "votes",
+      "created_at"
+    );
+    expect(actual[1]).toHaveProperty(
+      "body",
+      "article_id",
+      "author",
+      "votes",
+      "created_at"
+    );
+    expect(actual[2]).toHaveProperty(
+      "body",
+      "article_id",
+      "author",
+      "votes",
+      "created_at"
+    );
+    expect(actual[0].created_at instanceof Date).toBe(true);
+    expect(actual[1].created_at instanceof Date).toBe(true);
+    expect(actual[2].created_at instanceof Date).toBe(true);
+  });
+  test("Original input is not mutated", function() {
+    const input = [
+      {
+        body:
+          "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+        belongs_to: "They're not exactly dogs, are they?",
+        created_by: "butter_bridge",
+        votes: 16,
+        created_at: 1511354163389
+      }
+    ];
+    const referenceObject = {
+      "They're not exactly dogs, are they?": 1,
+      "Living in the shadow of a great man": 2,
+      "Hello Magazine": 3
+    };
+    formatComments(input, referenceObject);
+
+    expect(input).toEqual([
+      {
+        body:
+          "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+        belongs_to: "They're not exactly dogs, are they?",
+        created_by: "butter_bridge",
+        votes: 16,
+        created_at: 1511354163389
+      }
+    ]);
+  });
+  test("Return value is different reference from input", function() {
+    const input = [];
+    expect(formatComments(input)).not.toBe(input);
+  });
+});
