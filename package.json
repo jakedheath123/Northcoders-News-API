@@ -9,8 +9,7 @@
     "migrate-latest": "knex migrate:latest && npm run query-db",
     "query-db": "psql -f ./db/query-db.sql > query-output.txt",
     "setup-dbs": "psql -f db/setup.sql",
-    "seed-test": "npm run setup-dbs && NODE_ENV=test knex seed:run",
-    "seed": "npm run migrate-rollback && npm run migrate-latest && knex seed:run",
+    "seed": "npm run setup-dbs && knex seed:run",
     "test-utils": "jest spec/utils.spec.js",
     "test": "jest spec/app.spec.js && npm run query-db",
     "dev": "nodemon listen.js"
@@ -34,6 +33,7 @@
     "supertest": "^4.0.2"
   },
   "devDependencies": {
+    "jest-extended": "^0.11.5",
     "nodemon": "^2.0.2"
   }
 }
