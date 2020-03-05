@@ -6,7 +6,7 @@
 
 
 SELECT *
-FROM comments;
+FROM articles;
 
-
+SELECT * FROM comments;
 

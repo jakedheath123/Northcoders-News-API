@@ -35,4 +35,20 @@ exports.updateArticleById = function(article_id, inc_votes = 0) {
     });
 };
 
-exports.insertCommentByArticleId = function() {};
+exports.insertCommentByArticleId = function(article_id, username, body) {
+  return connection("comments")
+    .insert([{ author: username, article_id: article_id, body: body }])
+    .returning("*")
+    .then(function([result]) {
+      if (!result) {
+        return Promise.reject({ status: 400, msg: "Bad request" });
+      }
+      return result;
+    });
+};
+
+exports.fetchCommentsByArticleId = function(article_id) {
+  return connection("comments")
+    .select("comment_id", "votes", "created_at", "author", "body")
+    .where("article_id", article_id);
+};
