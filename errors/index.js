@@ -1,8 +1,5 @@
 exports.handle400Errors = function(error, request, response, next) {
-  //42703 - undefined column
-  //23502 - not null violation
-  //22P02 - invalid text representation
-  const psqlBadRequestCodes = ["22P02"];
+  const psqlBadRequestCodes = ["22P02", "23502", "42703"];
   if (psqlBadRequestCodes.includes(error.code)) {
     response.status(400).send({ msg: "Bad request" });
   } else next(error);

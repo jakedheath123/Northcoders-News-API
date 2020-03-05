@@ -2,11 +2,18 @@ process.env.NODE_ENV = "test";
 const request = require("supertest");
 const app = require("../app");
 const connection = require("../db/connection");
-
+const { checkIsAscending, checkIsDescending } = require("./custom-matchers");
 
 expect.extend({
-  toBeAscendingBy(received, column, shouldBeNumbers = { shouldBeNumbers: false }) {
-    const pass = checkIsAscending(received, column, shouldBeNumbers);
+  toBeAscendingBy(
+    received,
+    column,
+    shouldBeNumbers = { shouldBeNumbers: false }
+  ) {
+    const pass = checkIsAscending(received, {
+      key: column,
+      ...shouldBeNumbers
+    });
     if (pass) {
       return {
         message: () => "is ascending all good!",
@@ -14,16 +21,25 @@ expect.extend({
       };
     } else {
       return {
-        message: () => `[${JSON.stringify(received[0])},${JSON.stringify(received[1])}...] is not in ascending order`,
+        message: () =>
+          `[${JSON.stringify(received[0])},${JSON.stringify(
+            received[1]
+          )}...] is not in ascending order`,
         pass: false
       };
     }
   }
 });
-​
 expect.extend({
-  toBeDescendingBy(received, column, shouldBeNumbers = { shouldBeNumbers: false }) {
-    const pass = checkIsDescending(received, column, shouldBeNumbers);
+  toBeDescendingBy(
+    received,
+    column,
+    shouldBeNumbers = { shouldBeNumbers: false }
+  ) {
+    const pass = checkIsDescending(received, {
+      key: column,
+      ...shouldBeNumbers
+    });
     if (pass) {
       return {
         message: () => "is descending all good!",
@@ -31,13 +47,15 @@ expect.extend({
       };
     } else {
       return {
-        message: () => `[${JSON.stringify(received[0])},${JSON.stringify(received[1])}...] is not in descending order`,
+        message: () =>
+          `[${JSON.stringify(received[0])},${JSON.stringify(
+            received[1]
+          )}...] is not in descending order`,
         pass: false
       };
     }
   }
 });
-
 
 describe("Northcoders News API", function() {
   beforeEach(function() {
@@ -134,6 +152,17 @@ describe("Northcoders News API", function() {
       });
     });
     describe("/articles", function() {
+      describe("GET", function() {
+        xtest("Status : 200 - Responds with an array of all articles objects, including comment count, on the key of articles", function() {
+          return request(app)
+            .get("/api/articles")
+            .expect(200)
+            .then(function({ body: { articles } }) {
+              expect(Array.isArray(articles)).toBe(true);
+              expect(articles).toContainKeys(["comment_count"]);
+            });
+        });
+      });
       describe("/:article_id", function() {
         describe("GET", function() {
           test("Status : 200 - Responds with an object of a single article by article_id, on a key of article", function() {
@@ -280,18 +309,6 @@ describe("Northcoders News API", function() {
                 expect(response.body.msg).toEqual("Bad request");
               });
           });
-          xtest("Status : 400 - Provided more than one property on request body", function() {
-            return request(app)
-              .patch("/api/articles/2")
-              .send({
-                inc_votes: 1,
-                name: "Mitch"
-              })
-              .expect(400)
-              .then(function(response) {
-                expect(response.body.msg).toEqual("Bad request");
-              });
-          });
         });
 
         describe("/comments", function() {
@@ -329,8 +346,19 @@ describe("Northcoders News API", function() {
                   expect(msg).toEqual("Bad request");
                 });
             });
-            xtest("Status : 400 - Provided extra column", function() {});
-            xtest("Status : 400 - Missing column", function() {
+            test("Status : 400 - Provided unwanted columns", function() {
+              return request(app)
+                .post("/api/articles/1/comments")
+                .send({
+                  username: "butter_bridge",
+                  job: "Coder"
+                })
+                .expect(400)
+                .then(function({ body: { msg } }) {
+                  expect(msg).toEqual("Bad request");
+                });
+            });
+            test("Status : 400 - Missing keys", function() {
               return request(app)
                 .post("/api/articles/1/comments")
                 .send({
@@ -341,7 +369,19 @@ describe("Northcoders News API", function() {
                   expect(msg).toEqual("Bad request");
                 });
             });
-            xtest("Status 404 - Fails on id reference", function() {});
+            xtest("Status : 404 - Fails on id reference", function() {
+              return request(app)
+                .post("/api/articles/123456/comments")
+                .send({
+                  username: "butter_bridge",
+                  body: "One two three"
+                })
+                .expect(404)
+                .then(function({ body: { msg } }) {
+                  expect(msg).toEqual("Article id is not found");
+                });
+            });
+            xtest("Status : 400 - Entered wrong data type", function() {});
           });
           describe("GET", function() {
             test("Status : 200 - Responds with array of objects of comments for chosen article_id, on the key of comments", function() {
@@ -381,14 +421,51 @@ describe("Northcoders News API", function() {
                   ]);
                 });
             });
-            test("Status : 200 - Default sort_by order is set to created_at", function() {
+            test("Status : 200 - Returns sorted by created_at by default", function() {
               return request(app)
-              .get("/api/articles/1/comments")
-              .expect(200)
-              .then(function({body : {comments}}) {
-                expect(comments).
-              })
+                .get("/api/articles/1/comments")
+                .expect(200)
+                .then(function({ body: { comments } }) {
+                  const formattedComments = comments.map(({ created_at }) => {
+                    return new Date(created_at);
+                  });
+                  expect(comments).toBeAscendingBy("created_at");
+                });
             });
+            test("Status : 200 - Can sort by votes", function() {
+              return request(app)
+                .get("/api/articles/1/comments?sort_by=votes")
+                .expect(200)
+                .then(function({ body: { comments } }) {
+                  expect(comments).toBeAscendingBy("votes");
+                });
+            });
+            test("Status : 200 - Can sort by comment_id", function() {
+              return request(app)
+                .get("/api/articles/1/comments?sort_by=comment_id")
+                .expect(200)
+                .then(function({ body: { comments } }) {
+                  expect(comments).toBeAscendingBy("comment_id");
+                });
+            });
+            test("Status : 200 - Can sort by author", function() {
+              return request(app)
+                .get("/api/articles/1/comments?sort_by=author")
+                .expect(200)
+                .then(function({ body: { comments } }) {
+                  expect(comments).toBeAscendingBy("author");
+                });
+            });
+            test("Status : 400 - Responds with bad request when provided with invalid column to sort_by", function() {
+              return request(app)
+                .get("/api/articles/1/comments?sort_by=invalid")
+                .expect(400)
+                .then(function({ body: { msg } }) {
+                  expect(msg).toEqual("Bad request");
+                });
+            });
+            test("Status : 404 - Responds with route not found when route is not found", function() {});
+            test("Status : 400 - Responds with a bad request when passed an invalid order", function() {});
           });
         });
       });

@@ -47,8 +47,19 @@ exports.insertCommentByArticleId = function(article_id, username, body) {
     });
 };
 
-exports.fetchCommentsByArticleId = function(article_id) {
+exports.fetchCommentsByArticleId = function(
+  article_id,
+  sort_by = "created_at"
+) {
   return connection("comments")
     .select("comment_id", "votes", "created_at", "author", "body")
-    .where("article_id", article_id);
+    .where("article_id", article_id)
+    .orderBy(sort_by)
+    .then(function(comments) {
+      return comments;
+    });
+};
+
+exports.fetchAllArticles = function() {
+  return connection.select("*").from("articles");
 };
