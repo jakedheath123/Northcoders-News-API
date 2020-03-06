@@ -49,17 +49,34 @@ exports.insertCommentByArticleId = function(article_id, username, body) {
 
 exports.fetchCommentsByArticleId = function(
   article_id,
-  sort_by = "created_at"
+  sort_by = "created_at",
+  order = "desc"
 ) {
   return connection("comments")
     .select("comment_id", "votes", "created_at", "author", "body")
     .where("article_id", article_id)
-    .orderBy(sort_by)
+    .orderBy(sort_by, order)
     .then(function(comments) {
       return comments;
     });
 };
 
-exports.fetchAllArticles = function() {
-  return connection.select("*").from("articles");
+exports.fetchAllArticles = function(
+  sort_by = "articles.created_at",
+  order = "desc"
+) {
+  return connection("articles")
+    .select(
+      "articles.article_id",
+      "articles.author",
+      "articles.created_at",
+      "title",
+      "topic",
+      "articles.votes"
+    )
+    .count("comments.comment_id AS comment_count")
+    .leftJoin("comments", "comments.article_id", "=", "articles.article_id")
+    .groupBy("articles.article_id")
+    .orderBy(sort_by, order)
+    .returning("*");
 };

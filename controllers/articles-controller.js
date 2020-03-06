@@ -47,17 +47,25 @@ exports.postCommentByArticleId = function(request, response, next) {
 exports.getCommentsByArticleId = function(request, response, next) {
   const { article_id } = request.params;
   const { sort_by } = request.query;
+  const { order } = request.query;
 
-  fetchCommentsByArticleId(article_id, sort_by)
+  fetchCommentsByArticleId(article_id, sort_by, order)
     .then(function(comments) {
       response.status(200).send({ comments });
     })
     .catch(function(error) {
-      console.log(error);
       next(error);
     });
 };
 
 exports.getAllArticles = function(request, response, next) {
-  fetchAllArticles().then(function(articles) {});
+  const { sort_by } = request.query;
+  const { order } = request.query;
+  fetchAllArticles(sort_by, order)
+    .then(function(articles) {
+      response.status(200).send({ articles });
+    })
+    .catch(function(error) {
+      next(error);
+    });
 };

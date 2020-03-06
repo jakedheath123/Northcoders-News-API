@@ -153,13 +153,88 @@ describe("Northcoders News API", function() {
     });
     describe("/articles", function() {
       describe("GET", function() {
-        xtest("Status : 200 - Responds with an array of all articles objects, including comment count, on the key of articles", function() {
+        test("Status : 200 - Responds with an array of all article objects with correct properties, on the key of articles", function() {
           return request(app)
             .get("/api/articles")
             .expect(200)
             .then(function({ body: { articles } }) {
               expect(Array.isArray(articles)).toBe(true);
-              expect(articles).toContainKeys(["comment_count"]);
+              expect(articles[0]).toContainKeys([
+                "author",
+                "title",
+                "article_id",
+                "topic",
+                "created_at",
+                "votes",
+                "comment_count"
+              ]);
+            });
+        });
+        test("Status : 200 -  Returns sorted by created_at by default, which defaults to descending", function() {
+          return request(app)
+            .get("/api/articles")
+            .expect(200)
+            .then(function({ body: { articles } }) {
+              const formattedComments = articles.map(({ created_at }) => {
+                return new Date(created_at);
+              });
+              expect(articles).toBeDescendingBy("articles.created_at");
+            });
+        });
+        test("Status : 200 - Accepts 'sort_by' query - Can sort by author", function() {
+          return request(app)
+            .get("/api/articles?sort_by=articles.author")
+            .expect(200)
+            .then(function({ body: { articles } }) {
+              expect(articles).toBeDescendingBy("articles.author");
+            });
+        });
+        test("Status : 200 - Accepts 'sort_by' query - Can sort by votes", function() {
+          return request(app)
+            .get("/api/articles?sort_by=articles.votes")
+            .expect(200)
+            .then(function({ body: { articles } }) {
+              expect(articles).toBeDescendingBy("articles.votes");
+            });
+        });
+        test("Status : 200 - Accepts 'sort_by' query - Can sort by article_id", function() {
+          return request(app)
+            .get("/api/articles?sort_by=articles.article_id")
+            .expect(200)
+            .then(function({ body: { articles } }) {
+              expect(articles).toBeDescendingBy("articles.article_id");
+            });
+        });
+        test("Status : 200 - Accepts 'order' query - Can set to asc for ascending", function() {
+          return request(app)
+            .get("/api/articles?sort_by=title&order=asc")
+            .expect(200)
+            .then(function({ body: { articles } }) {
+              expect(articles).toBeAscendingBy("title");
+            });
+        });
+        test("Status : 200 - Accepts 'order' query - Can set to desc for descending", function() {
+          return request(app)
+            .get("/api/articles/?sort_by=articles.article_id&order=desc")
+            .expect(200)
+            .then(function({ body: { articles } }) {
+              expect(articles).toBeDescendingBy("articles.article_id");
+            });
+        });
+        test("Status : 400 - Responds with bad request when provided with invalid column to sort_by", function() {
+          return request(app)
+            .get("/api/articles/?sort_by=invalid")
+            .expect(400)
+            .then(function({ body: { msg } }) {
+              expect(msg).toEqual("Bad request");
+            });
+        });
+        test("Status : 404 - Responds with route not found when route is not found", function() {
+          return request(app)
+            .get("/api/article")
+            .expect(404)
+            .then(function({ body: { msg } }) {
+              expect(msg).toEqual("Route not found");
             });
         });
       });
@@ -421,7 +496,7 @@ describe("Northcoders News API", function() {
                   ]);
                 });
             });
-            test("Status : 200 - Returns sorted by created_at by default", function() {
+            test("Status : 200 - Returns sorted by created_at by default, which defaults to descending", function() {
               return request(app)
                 .get("/api/articles/1/comments")
                 .expect(200)
@@ -429,33 +504,50 @@ describe("Northcoders News API", function() {
                   const formattedComments = comments.map(({ created_at }) => {
                     return new Date(created_at);
                   });
-                  expect(comments).toBeAscendingBy("created_at");
+                  expect(comments).toBeDescendingBy("created_at");
                 });
             });
-            test("Status : 200 - Can sort by votes", function() {
+            test("Status : 200 - Accepts 'sort_by' query - Can sort by votes", function() {
               return request(app)
                 .get("/api/articles/1/comments?sort_by=votes")
                 .expect(200)
                 .then(function({ body: { comments } }) {
-                  expect(comments).toBeAscendingBy("votes");
+                  expect(comments).toBeDescendingBy("votes");
                 });
             });
-            test("Status : 200 - Can sort by comment_id", function() {
+            test("Status : 200 - Accepts 'sort_by' query - Can sort by comment_id", function() {
               return request(app)
                 .get("/api/articles/1/comments?sort_by=comment_id")
+                .expect(200)
+                .then(function({ body: { comments } }) {
+                  expect(comments).toBeDescendingBy("comment_id");
+                });
+            });
+            test("Status : 200 - Accepts 'sort_by' query - Can sort by author", function() {
+              return request(app)
+                .get("/api/articles/1/comments?sort_by=author")
+                .expect(200)
+                .then(function({ body: { comments } }) {
+                  expect(comments).toBeDescendingBy("author");
+                });
+            });
+            test("Status : 200 - Accepts 'order' query - Can set to asc for ascending", function() {
+              return request(app)
+                .get("/api/articles/1/comments?sort_by=comment_id&order=asc")
                 .expect(200)
                 .then(function({ body: { comments } }) {
                   expect(comments).toBeAscendingBy("comment_id");
                 });
             });
-            test("Status : 200 - Can sort by author", function() {
+            test("Status : 200 - Accepts 'order' query - Can set to desc for descending", function() {
               return request(app)
-                .get("/api/articles/1/comments?sort_by=author")
+                .get("/api/articles/2/comments?sort_by=comment_id&order=desc")
                 .expect(200)
                 .then(function({ body: { comments } }) {
-                  expect(comments).toBeAscendingBy("author");
+                  expect(comments).toBeDescendingBy("comment_id");
                 });
             });
+
             test("Status : 400 - Responds with bad request when provided with invalid column to sort_by", function() {
               return request(app)
                 .get("/api/articles/1/comments?sort_by=invalid")
@@ -464,8 +556,23 @@ describe("Northcoders News API", function() {
                   expect(msg).toEqual("Bad request");
                 });
             });
-            test("Status : 404 - Responds with route not found when route is not found", function() {});
-            test("Status : 400 - Responds with a bad request when passed an invalid order", function() {});
+            xtest("Status : 400 - Responds with a bad request when passed an invalid order", function() {
+              return request(app)
+                .get("/api/articles/1/comments?sort_by=author&order=improve")
+                .expect(400)
+                .then(function({ body: { msg } }) {
+                  expect(msg).toEqual("Bad request");
+                });
+            });
+
+            test("Status : 404 - Responds with route not found when route is not found", function() {
+              return request(app)
+                .get("/api/articles/1/comets?sort_by=author&order=asc")
+                .expect(404)
+                .then(function({ body: { msg } }) {
+                  expect(msg).toEqual("Route not found");
+                });
+            });
           });
         });
       });
