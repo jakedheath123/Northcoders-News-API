@@ -2,8 +2,8 @@ exports.formatDates = function(array) {
   const formattedDate = array.map(function(object) {
     const newObject = { ...object };
 
-    const objectDate = object.created_at;
-    const updatedDate = new Date(objectDate);
+    const date = object.created_at;
+    const updatedDate = new Date(date);
     newObject.created_at = updatedDate;
 
     return newObject;

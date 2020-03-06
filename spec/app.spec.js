@@ -114,40 +114,104 @@ describe("Northcoders News API", function() {
       });
     });
     describe("/comments", function() {
-      describe("PATCH", function() {
-        test("Status : 200 - Successfully increases votes key value when passed a positive number", function() {
-          return request(app)
-            .patch("/api/comments/1")
-            .send({
-              inc_votes: 5
-            })
-            .expect(200)
-            .then(function({ body: { comment } }) {
-              expect(comment.votes).toBe(21);
-            });
-        });
-        test("Status : 200 - Successfully decreases votes key value when passed a negative number", function() {
-          return request(app)
-            .patch("/api/comments/1")
-            .send({
-              inc_votes: -5
-            })
-            .expect(200)
-            .then(function({ body: { comment } }) {
-              expect(comment.votes).toBe(11);
-            });
-        });
-        test("Status : 200 - Response comment is one object, on a key of comment", function() {
-          return request(app)
-            .patch("/api/comments/1")
-            .send({
-              inc_votes: 5
-            })
-            .expect(200)
-            .then(function({ body: { comment } }) {
-              expect(typeof comment).toEqual("object");
-              expect(Array.isArray(comment)).toBe(false);
-            });
+      describe("/:comment_id", function() {
+        describe("PATCH", function() {
+          test("Status : 200 - Successfully increases votes key value when passed a positive number", function() {
+            return request(app)
+              .patch("/api/comments/1")
+              .send({
+                inc_votes: 5
+              })
+              .expect(200)
+              .then(function({ body: { comment } }) {
+                expect(comment.votes).toBe(21);
+              });
+          });
+          test("Status : 200 - Successfully decreases votes key value when passed a negative number", function() {
+            return request(app)
+              .patch("/api/comments/1")
+              .send({
+                inc_votes: -5
+              })
+              .expect(200)
+              .then(function({ body: { comment } }) {
+                expect(comment.votes).toBe(11);
+              });
+          });
+          test("Status : 200 - Response comment is one object, on a key of comment", function() {
+            return request(app)
+              .patch("/api/comments/1")
+              .send({
+                inc_votes: 5
+              })
+              .expect(200)
+              .then(function({ body: { comment } }) {
+                expect(typeof comment).toEqual("object");
+                expect(Array.isArray(comment)).toBe(false);
+              });
+          });
+          test("Status : 200 - Response comment contains correct keys", function() {
+            return request(app)
+              .patch("/api/comments/1")
+              .send({
+                inc_votes: 99
+              })
+              .expect(200)
+              .then(function({ body: { comment } }) {
+                expect(comment).toContainKeys([
+                  "comment_id",
+                  "author",
+                  "article_id",
+                  "votes",
+                  "created_at",
+                  "body"
+                ]);
+              });
+          });
+          test("Status : 404 - Provided a non-existent comment_id", function() {
+            return request(app)
+              .patch("/api/comments/12349")
+              .send({
+                inc_votes: 100
+              })
+              .expect(404)
+              .then(function({ body: { msg } }) {
+                expect(msg).toEqual("Comment not found");
+              });
+          });
+          test("Status : 400 - Provided a non-valid ID", function() {
+            return request(app)
+              .patch("/api/comments/one")
+              .send({
+                inc_votes: 50
+              })
+              .expect(400)
+              .then(function({ body: { msg } }) {
+                expect(msg).toEqual("Bad request");
+              });
+          });
+          test("Status : 200 - Missing required fields, returns an object of the unchanged comment on the key of comment", function() {
+            return request(app)
+              .patch("/api/comments/1")
+              .send({})
+              .expect(200)
+              .then(function({ body: { comment } }) {
+                expect(typeof comment).toEqual("object");
+                expect(Array.isArray(comment)).toBe(false);
+                expect(comment.votes).toBe(16);
+              });
+          });
+          test("Status : 400 - Provided incorrect data type", function() {
+            return request(app)
+              .patch("/api/comments/2")
+              .send({
+                inc_votes: "string"
+              })
+              .expect(400)
+              .then(function({ body: { msg } }) {
+                expect(msg).toEqual("Bad request");
+              });
+          });
         });
       });
     });
@@ -187,8 +251,23 @@ describe("Northcoders News API", function() {
               });
           });
         });
+        describe("Invalid Methods", function() {
+          test("Status : 405 - Provided invalid method", function() {
+            const invalidMethods = ["delete", "patch", "put", "post"];
+            const promiseArray = invalidMethods.map(function(method) {
+              return request(app)
+                [method]("/api/users/butter_bridge")
+                .expect(405)
+                .then(function({ body: { msg } }) {
+                  expect(msg).toEqual("Method not allowed");
+                });
+            });
+            return Promise.all(promiseArray);
+          });
+        });
       });
     });
+
     describe("/articles", function() {
       describe("GET", function() {
         test("Status : 200 - Responds with an array of all article objects with correct properties, on the key of articles", function() {
@@ -287,6 +366,20 @@ describe("Northcoders News API", function() {
             .then(function({ body: { msg } }) {
               expect(msg).toEqual("Route not found");
             });
+        });
+      });
+      describe("Invalid Methods", function() {
+        test("Status : 405 - Provided invalid method", function() {
+          const invalidMethods = ["delete", "patch", "put", "post"];
+          const promiseArray = invalidMethods.map(function(method) {
+            return request(app)
+              [method]("/api/articles")
+              .expect(405)
+              .then(function({ body: { msg } }) {
+                expect(msg).toEqual("Method not allowed");
+              });
+          });
+          return Promise.all(promiseArray);
         });
       });
       describe("/:article_id", function() {
@@ -434,6 +527,20 @@ describe("Northcoders News API", function() {
               .then(function(response) {
                 expect(response.body.msg).toEqual("Bad request");
               });
+          });
+        });
+        describe("Invalid Methods", function() {
+          test("Status : 405 - Provided invalid method", function() {
+            const invalidMethods = ["delete", "put", "post"];
+            const promiseArray = invalidMethods.map(function(method) {
+              return request(app)
+                [method]("/api/articles/1")
+                .expect(405)
+                .then(function({ body: { msg } }) {
+                  expect(msg).toEqual("Method not allowed");
+                });
+            });
+            return Promise.all(promiseArray);
           });
         });
 
@@ -623,6 +730,20 @@ describe("Northcoders News API", function() {
                 .then(function({ body: { msg } }) {
                   expect(msg).toEqual("Route not found");
                 });
+            });
+          });
+          describe("Invalid Methods", function() {
+            test("Status : 405 - Provided invalid method", function() {
+              const invalidMethods = ["delete", "patch", "put"];
+              const promiseArray = invalidMethods.map(function(method) {
+                return request(app)
+                  [method]("/api/articles/1/comments")
+                  .expect(405)
+                  .then(function({ body: { msg } }) {
+                    expect(msg).toEqual("Method not allowed");
+                  });
+              });
+              return Promise.all(promiseArray);
             });
           });
         });

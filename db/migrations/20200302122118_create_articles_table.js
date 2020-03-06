@@ -1,6 +1,6 @@
 exports.up = function(knex) {
   return knex.schema.createTable("articles", function(articlesTable) {
-    articlesTable.increments("article_id").primary();
+    articlesTable.increments("article_id");
     articlesTable.string("title").notNullable();
     articlesTable.text("body").notNullable();
     articlesTable.integer("votes").defaultTo(0);
