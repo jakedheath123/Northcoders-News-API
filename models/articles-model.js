@@ -52,6 +52,9 @@ exports.fetchCommentsByArticleId = function(
   sort_by = "created_at",
   order = "desc"
 ) {
+  if (order !== "asc" && order !== "desc") {
+    return Promise.reject({ status: 400, msg: "Bad request" });
+  }
   return connection("comments")
     .select("comment_id", "votes", "created_at", "author", "body")
     .where("article_id", article_id)

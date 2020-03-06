@@ -556,7 +556,7 @@ describe("Northcoders News API", function() {
                   expect(msg).toEqual("Bad request");
                 });
             });
-            xtest("Status : 400 - Responds with a bad request when passed an invalid order", function() {
+            test("Status : 400 - Responds with a bad request when passed an invalid order", function() {
               return request(app)
                 .get("/api/articles/1/comments?sort_by=author&order=improve")
                 .expect(400)
