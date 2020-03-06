@@ -68,6 +68,8 @@ exports.fetchAllArticles = function(
   sort_by = "articles.created_at",
   order = "desc"
 ) {
+  if (order !== "asc" && order !== "desc")
+    return Promise.reject({ status: 400, msg: "Bad request" });
   return connection("articles")
     .select(
       "articles.article_id",

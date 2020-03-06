@@ -229,6 +229,14 @@ describe("Northcoders News API", function() {
               expect(msg).toEqual("Bad request");
             });
         });
+        test("Status : 400 - Responds with a bad request when passed an invalid order", function() {
+          return request(app)
+            .get("/api/articles/?sort_by=comment_count&order=improve")
+            .expect(400)
+            .then(function({ body: { msg } }) {
+              expect(msg).toEqual("Bad request");
+            });
+        });
         test("Status : 404 - Responds with route not found when route is not found", function() {
           return request(app)
             .get("/api/article")
