@@ -61,7 +61,9 @@ exports.getCommentsByArticleId = function(request, response, next) {
 exports.getAllArticles = function(request, response, next) {
   const { sort_by } = request.query;
   const { order } = request.query;
-  fetchAllArticles(sort_by, order)
+  const { author } = request.query;
+
+  fetchAllArticles(sort_by, order, author)
     .then(function(articles) {
       response.status(200).send({ articles });
     })

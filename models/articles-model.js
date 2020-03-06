@@ -66,7 +66,8 @@ exports.fetchCommentsByArticleId = function(
 
 exports.fetchAllArticles = function(
   sort_by = "articles.created_at",
-  order = "desc"
+  order = "desc",
+  author
 ) {
   if (order !== "asc" && order !== "desc")
     return Promise.reject({ status: 400, msg: "Bad request" });
@@ -79,9 +80,13 @@ exports.fetchAllArticles = function(
       "topic",
       "articles.votes"
     )
+    .modify(function(query) {
+      if (author) query.where({ author });
+    })
     .count("comments.comment_id AS comment_count")
     .leftJoin("comments", "comments.article_id", "=", "articles.article_id")
     .groupBy("articles.article_id")
     .orderBy(sort_by, order)
+
     .returning("*");
 };

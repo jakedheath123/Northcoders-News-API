@@ -113,6 +113,44 @@ describe("Northcoders News API", function() {
         });
       });
     });
+    describe("/comments", function() {
+      describe("PATCH", function() {
+        test("Status : 200 - Successfully increases votes key value when passed a positive number", function() {
+          return request(app)
+            .patch("/api/comments/1")
+            .send({
+              inc_votes: 5
+            })
+            .expect(200)
+            .then(function({ body: { comment } }) {
+              expect(comment.votes).toBe(21);
+            });
+        });
+        test("Status : 200 - Successfully decreases votes key value when passed a negative number", function() {
+          return request(app)
+            .patch("/api/comments/1")
+            .send({
+              inc_votes: -5
+            })
+            .expect(200)
+            .then(function({ body: { comment } }) {
+              expect(comment.votes).toBe(11);
+            });
+        });
+        test("Status : 200 - Response comment is one object, on a key of comment", function() {
+          return request(app)
+            .patch("/api/comments/1")
+            .send({
+              inc_votes: 5
+            })
+            .expect(200)
+            .then(function({ body: { comment } }) {
+              expect(typeof comment).toEqual("object");
+              expect(Array.isArray(comment)).toBe(false);
+            });
+        });
+      });
+    });
     describe("/users", function() {
       describe("/:username", function() {
         describe("GET", function() {
@@ -220,6 +258,11 @@ describe("Northcoders News API", function() {
             .then(function({ body: { articles } }) {
               expect(articles).toBeDescendingBy("articles.article_id");
             });
+        });
+        xtest("Status : 200 - Accepts 'author' query - Can filter articles by username value specified in the query", function() {
+          return request(app)
+            .get("/api/articles?author=butter_bridge")
+            .expect(200);
         });
         test("Status : 400 - Responds with bad request when provided with invalid column to sort_by", function() {
           return request(app)
