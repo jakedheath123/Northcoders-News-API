@@ -213,6 +213,20 @@ describe("Northcoders News API", function() {
               });
           });
         });
+        describe("Invalid Methods", function() {
+          test("Status : 405 - Provided invalid method", function() {
+            const invalidMethods = ["get", "put", "post"];
+            const promiseArray = invalidMethods.map(function(method) {
+              return request(app)
+                [method]("/api/comments/1")
+                .expect(405)
+                .then(function({ body: { msg } }) {
+                  expect(msg).toEqual("Method not allowed");
+                });
+            });
+            return Promise.all(promiseArray);
+          });
+        });
       });
     });
     describe("/users", function() {
@@ -341,7 +355,10 @@ describe("Northcoders News API", function() {
         xtest("Status : 200 - Accepts 'author' query - Can filter articles by username value specified in the query", function() {
           return request(app)
             .get("/api/articles?author=butter_bridge")
-            .expect(200);
+            .expect(200)
+            .then(function(response) {
+              ///.every()
+            });
         });
         test("Status : 400 - Responds with bad request when provided with invalid column to sort_by", function() {
           return request(app)
