@@ -3,12 +3,6 @@ const ENV = process.env.NODE_ENV || "development";
 
 const { DB_URL } = process.env;
 
-const customConfigs = {
-  production: {
-    connection: `${DB_URL}?ssl=true`
-  }
-};
-
 const baseConfig = {
   client: "pg",
   migrations: {
@@ -29,6 +23,9 @@ const customConfig = {
     connection: {
       database: "nc_news_test"
     }
+  },
+  production: {
+    connection: `${DB_URL}?ssl=true`
   }
 };
 

@@ -62,7 +62,7 @@ describe("Northcoders News API", function() {
     return connection.seed.run();
   });
   describe("/api", function() {
-    describe("/topics", function() {
+    describe.only("/topics", function() {
       describe("GET", function() {
         test("Status : 200 - Responds with an array of all topics objects on the key of topics", function() {
           return request(app)
