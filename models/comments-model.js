@@ -12,3 +12,9 @@ exports.updateCommentById = function(comment_id, inc_votes = 0) {
       return result;
     });
 };
+
+exports.removeCommentById = function(comment_id) {
+  return connection("comments")
+    .where("comment_id", comment_id)
+    .del();
+};
