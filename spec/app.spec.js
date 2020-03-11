@@ -5,15 +5,8 @@ const connection = require("../db/connection");
 const { checkIsAscending, checkIsDescending } = require("./custom-matchers");
 
 expect.extend({
-  toBeAscendingBy(
-    received,
-    column,
-    shouldBeNumbers = { shouldBeNumbers: false }
-  ) {
-    const pass = checkIsAscending(received, {
-      key: column,
-      ...shouldBeNumbers
-    });
+  toBeAscendingBy(received, func) {
+    const pass = checkIsAscending(received, func);
     if (pass) {
       return {
         message: () => "is ascending all good!",
@@ -31,15 +24,8 @@ expect.extend({
   }
 });
 expect.extend({
-  toBeDescendingBy(
-    received,
-    column,
-    shouldBeNumbers = { shouldBeNumbers: false }
-  ) {
-    const pass = checkIsDescending(received, {
-      key: column,
-      ...shouldBeNumbers
-    });
+  toBeDescendingBy(received, func) {
+    const pass = checkIsDescending(received, func);
     if (pass) {
       return {
         message: () => "is descending all good!",
@@ -62,7 +48,21 @@ describe("Northcoders News API", function() {
     return connection.seed.run();
   });
   describe("/api", function() {
-    describe.only("/topics", function() {
+    describe("Invalid methods", function() {
+      test("Provided invalid method", function() {
+        const invalidMethods = ["delete"];
+        const promiseArray = invalidMethods.map(function(method) {
+          return request(app)
+            [method]("/api")
+            .expect(405)
+            .then(function({ body: { msg } }) {
+              expect(msg).toEqual("Method not allowed");
+            });
+        });
+        return Promise.all(promiseArray);
+      });
+    });
+    describe("/topics", function() {
       describe("GET", function() {
         test("Status : 200 - Responds with an array of all topics objects on the key of topics", function() {
           return request(app)
@@ -213,6 +213,32 @@ describe("Northcoders News API", function() {
               });
           });
         });
+        describe("DELETE", function() {
+          test("Status : 204 - Successfully deletes comment by comment_id", function() {
+            return request(app)
+              .delete("/api/comments/1")
+              .expect(204)
+              .then(function(response) {
+                expect(response.body).toEqual({});
+              });
+          });
+          test("Status : 400 - Provided an invalid comment_id", function() {
+            return request(app)
+              .delete("/api/comments/john")
+              .expect(400)
+              .then(function({ body: { msg } }) {
+                expect(msg).toEqual("Bad request");
+              });
+          });
+          test("Status : 404 - Provided a non-existent ID", function() {
+            return request(app)
+              .delete("/api/comments/12345")
+              .expect(404)
+              .then(function({ body: { msg } }) {
+                expect(msg).toEqual("Comment not found");
+              });
+          });
+        });
         describe("Invalid Methods", function() {
           test("Status : 405 - Provided invalid method", function() {
             const invalidMethods = ["get", "put", "post"];
@@ -309,7 +335,7 @@ describe("Northcoders News API", function() {
               const formattedComments = articles.map(({ created_at }) => {
                 return new Date(created_at);
               });
-              expect(articles).toBeDescendingBy("articles.created_at");
+              expect(articles).toBeDescendingBy(({ created_at }) => created_at);
             });
         });
         test("Status : 200 - Accepts 'sort_by' query - Can sort by author", function() {
@@ -317,7 +343,7 @@ describe("Northcoders News API", function() {
             .get("/api/articles?sort_by=articles.author")
             .expect(200)
             .then(function({ body: { articles } }) {
-              expect(articles).toBeDescendingBy("articles.author");
+              expect(articles).toBeDescendingBy(articles => articles.author);
             });
         });
         test("Status : 200 - Accepts 'sort_by' query - Can sort by votes", function() {
@@ -325,7 +351,7 @@ describe("Northcoders News API", function() {
             .get("/api/articles?sort_by=articles.votes")
             .expect(200)
             .then(function({ body: { articles } }) {
-              expect(articles).toBeDescendingBy("articles.votes");
+              expect(articles).toBeDescendingBy(articles => articles.votes);
             });
         });
         test("Status : 200 - Accepts 'sort_by' query - Can sort by article_id", function() {
@@ -333,7 +359,9 @@ describe("Northcoders News API", function() {
             .get("/api/articles?sort_by=articles.article_id")
             .expect(200)
             .then(function({ body: { articles } }) {
-              expect(articles).toBeDescendingBy("articles.article_id");
+              expect(articles).toBeDescendingBy(
+                articles => articles.article_id
+              );
             });
         });
         test("Status : 200 - Accepts 'order' query - Can set to asc for ascending", function() {
@@ -341,7 +369,7 @@ describe("Northcoders News API", function() {
             .get("/api/articles?sort_by=title&order=asc")
             .expect(200)
             .then(function({ body: { articles } }) {
-              expect(articles).toBeAscendingBy("title");
+              expect(articles).toBeAscendingBy(article => article.title);
             });
         });
         test("Status : 200 - Accepts 'order' query - Can set to desc for descending", function() {
@@ -349,7 +377,7 @@ describe("Northcoders News API", function() {
             .get("/api/articles/?sort_by=articles.article_id&order=desc")
             .expect(200)
             .then(function({ body: { articles } }) {
-              expect(articles).toBeDescendingBy("articles.article_id");
+              expect(articles).toBeDescendingBy(({ article_id }) => article_id);
             });
         });
         xtest("Status : 200 - Accepts 'author' query - Can filter articles by username value specified in the query", function() {
@@ -679,7 +707,9 @@ describe("Northcoders News API", function() {
                   const formattedComments = comments.map(({ created_at }) => {
                     return new Date(created_at);
                   });
-                  expect(comments).toBeDescendingBy("created_at");
+                  expect(comments).toBeDescendingBy(
+                    ({ created_at }) => created_at
+                  );
                 });
             });
             test("Status : 200 - Accepts 'sort_by' query - Can sort by votes", function() {
@@ -687,7 +717,7 @@ describe("Northcoders News API", function() {
                 .get("/api/articles/1/comments?sort_by=votes")
                 .expect(200)
                 .then(function({ body: { comments } }) {
-                  expect(comments).toBeDescendingBy("votes");
+                  expect(comments).toBeDescendingBy(comments => comments.votes);
                 });
             });
             test("Status : 200 - Accepts 'sort_by' query - Can sort by comment_id", function() {
@@ -695,7 +725,9 @@ describe("Northcoders News API", function() {
                 .get("/api/articles/1/comments?sort_by=comment_id")
                 .expect(200)
                 .then(function({ body: { comments } }) {
-                  expect(comments).toBeDescendingBy("comment_id");
+                  expect(comments).toBeDescendingBy(
+                    comments => comments.comment_id
+                  );
                 });
             });
             test("Status : 200 - Accepts 'sort_by' query - Can sort by author", function() {
@@ -703,7 +735,9 @@ describe("Northcoders News API", function() {
                 .get("/api/articles/1/comments?sort_by=author")
                 .expect(200)
                 .then(function({ body: { comments } }) {
-                  expect(comments).toBeDescendingBy("author");
+                  expect(comments).toBeDescendingBy(
+                    comments => comments.author
+                  );
                 });
             });
             test("Status : 200 - Accepts 'order' query - Can set to asc for ascending", function() {
@@ -711,7 +745,9 @@ describe("Northcoders News API", function() {
                 .get("/api/articles/1/comments?sort_by=comment_id&order=asc")
                 .expect(200)
                 .then(function({ body: { comments } }) {
-                  expect(comments).toBeAscendingBy("comment_id");
+                  expect(comments).toBeAscendingBy(
+                    comments => comments.comment_id
+                  );
                 });
             });
             test("Status : 200 - Accepts 'order' query - Can set to desc for descending", function() {
