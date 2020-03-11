@@ -1,5 +1,6 @@
 exports.handle400Errors = function(error, request, response, next) {
   const psqlBadRequestCodes = ["22P02", "23502", "42703"];
+
   if (psqlBadRequestCodes.includes(error.code)) {
     response.status(400).send({ msg: "Bad request" });
   } else next(error);
