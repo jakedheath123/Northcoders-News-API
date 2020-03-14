@@ -647,7 +647,7 @@ describe("Northcoders News API", function() {
                   expect(msg).toEqual("Bad request");
                 });
             });
-            xtest("Status : 404 - Fails on id reference", function() {
+            test("Status : 404 - Fails on id reference", function() {
               return request(app)
                 .post("/api/articles/123456/comments")
                 .send({
@@ -656,10 +656,10 @@ describe("Northcoders News API", function() {
                 })
                 .expect(404)
                 .then(function({ body: { msg } }) {
-                  expect(msg).toEqual("Article id is not found");
+                  expect(msg).toEqual("Article id not found");
                 });
             });
-            xtest("Status : 400 - Entered wrong data type", function() {});
+            test("Status : 400 - Entered wrong data type", function() {});
           });
           describe("GET", function() {
             test("Status : 200 - Responds with array of objects of comments for chosen article_id, on the key of comments", function() {
