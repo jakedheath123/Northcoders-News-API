@@ -38,13 +38,7 @@ exports.updateArticleById = function(article_id, inc_votes = 0) {
 exports.insertCommentByArticleId = function(article_id, username, body) {
   return connection("comments")
     .insert({ author: username, article_id: article_id, body: body })
-    .returning("*")
-    .then(function([result]) {
-      if (!result) {
-        return Promise.reject({ status: 400, msg: "Bad request" });
-      }
-      return result;
-    });
+    .returning("*");
 };
 
 exports.fetchAllArticles = function(
