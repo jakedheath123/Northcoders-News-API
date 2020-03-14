@@ -79,8 +79,5 @@ exports.fetchCommentsByArticleId = function(
   return connection("comments")
     .select("comment_id", "votes", "created_at", "author", "body")
     .where("article_id", article_id)
-    .orderBy(sort_by, order)
-    .then(function(comments) {
-      return comments;
-    });
+    .orderBy(sort_by, order);
 };
