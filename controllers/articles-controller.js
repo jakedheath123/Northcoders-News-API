@@ -32,8 +32,7 @@ exports.patchArticleById = function(request, response, next) {
 
 exports.postCommentByArticleId = function(request, response, next) {
   const { article_id } = request.params;
-  const { username } = request.body;
-  const { body } = request.body;
+  const { username, body } = request.body;
 
   return insertCommentByArticleId(article_id, username, body)
     .then(function(comment) {
