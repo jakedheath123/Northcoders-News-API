@@ -1,5 +1,4 @@
 const ENV = process.env.NODE_ENV || "development";
-//console.log(`i am currently in ${ENV}`);
 
 const { DB_URL } = process.env;
 
