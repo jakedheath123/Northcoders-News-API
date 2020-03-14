@@ -63,9 +63,7 @@ exports.fetchAllArticles = function(
     .count("comments.comment_id AS comment_count")
     .leftJoin("comments", "comments.article_id", "=", "articles.article_id")
     .groupBy("articles.article_id")
-    .orderBy(sort_by, order)
-
-    .returning("*");
+    .orderBy(sort_by, order);
 };
 
 exports.fetchCommentsByArticleId = function(
