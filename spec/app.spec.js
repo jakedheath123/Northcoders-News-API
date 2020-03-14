@@ -327,7 +327,7 @@ describe("Northcoders News API", function() {
               ]);
             });
         });
-        test("Status : 200 -  Returns sorted by created_at by default, which defaults to descending", function() {
+        test("Status : 200 - Returns sorted by created_at by default, which defaults to descending", function() {
           return request(app)
             .get("/api/articles")
             .expect(200)

@@ -16,5 +16,11 @@ exports.updateCommentById = function(comment_id, inc_votes = 0) {
 exports.removeCommentById = function(comment_id) {
   return connection("comments")
     .where("comment_id", comment_id)
-    .del();
+    .del()
+    .then(function(result) {
+      if (result === 0)
+        return Promise.reject({ status: 404, msg: "Comment not found" });
+
+      return result;
+    });
 };
