@@ -600,7 +600,7 @@ describe("Northcoders News API", function() {
                 })
                 .expect(201)
                 .then(function({ body: { comment } }) {
-                  expect(comment[0]).toContainKeys([
+                  expect(comment).toContainKeys([
                     "comment_id",
                     "author",
                     "article_id",
@@ -608,10 +608,8 @@ describe("Northcoders News API", function() {
                     "created_at",
                     "body"
                   ]);
-                  expect(comment[0].body).toEqual(
-                    "I loved reading this article"
-                  );
-                  expect(comment[0].comment_id).toBe(19);
+                  expect(comment.body).toEqual("I loved reading this article");
+                  expect(comment.comment_id).toBe(19);
                 });
             });
             test("Status : 400 - Incorrect data type for article_id", function() {
