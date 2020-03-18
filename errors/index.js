@@ -6,6 +6,12 @@ exports.handle400Errors = function(error, request, response, next) {
   } else next(error);
 };
 
+exports.handle422Errors = function(error, request, response, next) {
+  if (error.code === "23503") {
+    response.status(422).send({ msg: "Unprocessable entity" });
+  } else next(error);
+};
+
 exports.handleCustomErrors = function(error, request, response, next) {
   if (error.status) {
     response.status(error.status).send({ msg: error.msg });

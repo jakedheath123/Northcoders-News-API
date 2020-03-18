@@ -39,8 +39,11 @@ exports.insertCommentByArticleId = function(article_id, username, body) {
   return connection("comments")
     .insert({ author: username, article_id: article_id, body: body })
     .returning("*")
-    .then(function([result]) {
-      return result;
+    .then(function([comment]) {
+      if (!comment)
+        return Promise.reject({ status: 404, msg: "Article id not found" });
+
+      return comment;
     });
 };
 
@@ -81,4 +84,14 @@ exports.fetchCommentsByArticleId = function(
     .select("comment_id", "votes", "created_at", "author", "body")
     .where("article_id", article_id)
     .orderBy(sort_by, order);
+};
+
+exports.checkArticleExists = function(article_id) {
+  return connection("articles")
+    .where("article_id", article_id)
+    .then(function([article]) {
+      if (!article)
+        return Promise.reject({ status: 404, msg: "Article id not found" });
+      return article;
+    });
 };

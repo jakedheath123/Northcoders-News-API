@@ -612,7 +612,7 @@ describe("Northcoders News API", function() {
                   expect(comment.comment_id).toBe(19);
                 });
             });
-            test("Status : 400 - Incorrect data type for article_id", function() {
+            test("Status : 400 - Provided incorrect data type for article_id", function() {
               return request(app)
                 .post("/api/articles/hello/comments")
                 .send({
@@ -636,7 +636,7 @@ describe("Northcoders News API", function() {
                   expect(msg).toEqual("Bad request");
                 });
             });
-            test("Status : 400 - Missing keys", function() {
+            test("Status : 400 - Provided Missing keys", function() {
               return request(app)
                 .post("/api/articles/1/comments")
                 .send({
@@ -647,19 +647,19 @@ describe("Northcoders News API", function() {
                   expect(msg).toEqual("Bad request");
                 });
             });
-            test("Status : 404 - Fails on id reference", function() {
+            test("Status : 404 - Provided non-existent id reference", function() {
               return request(app)
                 .post("/api/articles/123456/comments")
                 .send({
                   username: "butter_bridge",
                   body: "One two three"
                 })
-                .expect(404)
+                .expect(422)
                 .then(function({ body: { msg } }) {
-                  expect(msg).toEqual("Article id not found");
+                  expect(msg).toEqual("Unprocessable entity");
                 });
             });
-            test("Status : 400 - Entered wrong data type", function() {});
+            test("Status : 400 - Provided wrong data type", function() {});
           });
           describe("GET", function() {
             test("Status : 200 - Responds with array of objects of comments for chosen article_id, on the key of comments", function() {
@@ -773,6 +773,14 @@ describe("Northcoders News API", function() {
                 .expect(400)
                 .then(function({ body: { msg } }) {
                   expect(msg).toEqual("Bad request");
+                });
+            });
+            test("Status : 404 - Responds with article not found when provided with a valid article_id that does not exist", function() {
+              return request(app)
+                .get("/api/articles/1000/comments")
+                .expect(404)
+                .then(function({ body: { msg } }) {
+                  expect(msg).toEqual("Article id not found");
                 });
             });
 

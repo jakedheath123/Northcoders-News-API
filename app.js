@@ -4,7 +4,8 @@ const apiRouter = require("./routers/api-router");
 const {
   handle400Errors,
   handleCustomErrors,
-  handle500Errors
+  handle500Errors,
+  handle422Errors
 } = require("./errors/index");
 
 app.use(express.json());
@@ -16,6 +17,7 @@ app.all("/*", function(request, response, next) {
 });
 
 app.use(handle400Errors);
+app.use(handle422Errors);
 app.use(handleCustomErrors);
 app.use(handle500Errors);
 
