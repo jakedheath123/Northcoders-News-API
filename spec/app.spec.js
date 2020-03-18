@@ -647,7 +647,7 @@ describe("Northcoders News API", function() {
                   expect(msg).toEqual("Bad request");
                 });
             });
-            test("Status : 404 - Provided non-existent id reference", function() {
+            test("Status : 422 - Provided non-existent id reference", function() {
               return request(app)
                 .post("/api/articles/123456/comments")
                 .send({
