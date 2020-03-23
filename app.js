@@ -7,15 +7,14 @@ const {
   handle500Errors,
   handle422Errors
 } = require("./errors/index");
+const cors = require("cors");
 
+app.use(cors());
 app.use(express.json());
-
 app.use("/api", apiRouter);
-
 app.all("/*", function(request, response, next) {
   response.status(404).send({ msg: "Route not found" });
 });
-
 app.use(handle400Errors);
 app.use(handle422Errors);
 app.use(handleCustomErrors);
