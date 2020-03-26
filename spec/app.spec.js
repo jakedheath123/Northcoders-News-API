@@ -374,20 +374,51 @@ describe("Northcoders News API", function() {
         });
         test("Status : 200 - Accepts 'order' query - Can set to desc for descending", function() {
           return request(app)
-            .get("/api/articles/?sort_by=articles.article_id&order=desc")
+            .get("/api/articles/?sort_by=article_id&order=desc")
             .expect(200)
             .then(function({ body: { articles } }) {
               expect(articles).toBeDescendingBy(({ article_id }) => article_id);
             });
         });
-        xtest("Status : 200 - Accepts 'author' query - Can filter articles by username value specified in the query", function() {
+        test("Status : 200 - Accepts 'author' query - Can filter articles by username specified in the query", function() {
           return request(app)
             .get("/api/articles?author=butter_bridge")
             .expect(200)
-            .then(function(response) {
-              ///.every()
+            .then(function({ body: { articles } }) {
+              expect(articles).toHaveLength(3);
+              expect(articles[0].author).toBe("butter_bridge");
             });
         });
+
+        test("Status : 404 - Responds with author not found when provided none existent author", function() {
+          return request(app)
+            .get("/api/articles?author=not-an-author")
+            .expect(404)
+            .then(function({ body: { msg } }) {
+              expect(msg).toBe("Author not found");
+            });
+        });
+
+        test("Status : 200 - Accepts 'topic' query - Can filter articles by topic specified in the query", function() {
+          return request(app)
+            .get("/api/articles?topic=mitch")
+            .expect(200)
+            .then(function({ body: { articles } }) {
+              expect(articles).toHaveLength(11);
+
+              expect(articles[0].topic).toBe("mitch");
+            });
+        });
+
+        test("Status : 404 - Responds with topic not found when provided none existent topic", function() {
+          return request(app)
+            .get("/api/articles?topic=not-a-topic")
+            .expect(404)
+            .then(function({ body: { msg } }) {
+              expect(msg).toBe("Topic not found");
+            });
+        });
+
         test("Status : 400 - Responds with bad request when provided with invalid column to sort_by", function() {
           return request(app)
             .get("/api/articles/?sort_by=invalid")
