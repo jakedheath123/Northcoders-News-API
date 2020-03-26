@@ -50,7 +50,8 @@ exports.insertCommentByArticleId = function(article_id, username, body) {
 exports.fetchAllArticles = function(
   sort_by = "articles.created_at",
   order = "desc",
-  author
+  author,
+  topic
 ) {
   if (order !== "asc" && order !== "desc")
     return Promise.reject({ status: 400, msg: "Bad request" });
@@ -65,6 +66,7 @@ exports.fetchAllArticles = function(
     )
     .modify(function(query) {
       if (author) query.where("articles.author", "=", author);
+      if (topic) query.where("topic", "=", topic);
     })
     .count("comments.comment_id AS comment_count")
     .leftJoin("comments", "comments.article_id", "=", "articles.article_id")
@@ -93,5 +95,25 @@ exports.checkArticleExists = function(article_id) {
       if (!article)
         return Promise.reject({ status: 404, msg: "Article id not found" });
       return article;
+    });
+};
+
+exports.checkAuthorExists = function(author) {
+  return connection("users")
+    .where("username", author)
+    .then(function([user]) {
+      if (user === undefined)
+        return Promise.reject({ status: 404, msg: "Author not found" });
+      return user;
+    });
+};
+
+exports.checkTopicExists = function(topic) {
+  return connection("topics")
+    .where("slug", topic)
+    .then(function([result]) {
+      if (!result)
+        return Promise.reject({ status: 404, msg: "Topic not found" });
+      return result;
     });
 };
