@@ -4,7 +4,9 @@ const {
   insertCommentByArticleId,
   fetchCommentsByArticleId,
   fetchAllArticles,
-  checkArticleExists
+  checkArticleExists,
+  checkAuthorExists,
+  checkTopicExists
 } = require("../models/articles-model");
 
 exports.getArticleById = function(request, response, next) {
@@ -45,12 +47,14 @@ exports.postCommentByArticleId = function(request, response, next) {
 };
 
 exports.getAllArticles = function(request, response, next) {
-  const { sort_by } = request.query;
-  const { order } = request.query;
-  const { author } = request.query;
+  const { sort_by, order, author, topic } = request.query;
 
-  fetchAllArticles(sort_by, order, author)
-    .then(function(articles) {
+  const promises = [fetchAllArticles(sort_by, order, author, topic)];
+  if (author) promises.push(checkAuthorExists(author));
+  if (topic) promises.push(checkTopicExists(topic));
+
+  Promise.all(promises)
+    .then(function([articles]) {
       response.status(200).send({ articles });
     })
     .catch(function(error) {
