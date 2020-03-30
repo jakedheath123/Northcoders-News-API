@@ -10,7 +10,7 @@
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all topics",
+    "description": "serves an array of all articles",
     "queries": ["author", "topic", "sort_by", "order"],
     "exampleResponse": {
       "articles": [
@@ -19,9 +19,128 @@
           "topic": "cooking",
           "author": "weegembump",
           "body": "Text from the article..",
-          "created_at": 1527695953341
+          "created_at": "2018-05-27T03:32:28.514Z"
         }
       ]
     }
+  },
+  "GET /api/users/:username": {
+    "description": "serves a user object representing information of chosen username",
+    "queries": [],
+    "exampleResponse": {
+      "user": {
+        "username": "jessjelly",
+        "avatar_url": "https://s-media-cache-ak0.pinimg.com/564x/39/62/ec/3962eca164e60cf46f979c1f57d4078b.jpg",
+        "name": "Jess Jelly"
+      }
+    }
+  },
+  "GET /api/articles/:article_id": {
+    "description": "serves an article object representing information of chosen article id",
+    "queries": [],
+    "exampleResponse": {
+      "article": {
+        "article_id": 10,
+        "author": "cooljmessy",
+        "body": "When designing an application that will communicate with a remote computer, a data format and exchange protocol must be selected. There are a variety of open, standardized options, and the ideal choice depends on the applications requirements and pre-existing functionality. For example, SOAP-based web services format the data in an XML payload wrapped within a SOAP envelope. While XML works well for many application scenarios, it has some drawbacks that make it less than ideal for others. One such space where XML is often less than ideal is with Ajax-style web applications. Ajax is a technique used for building interactive web applications that provide a snappier user experience through the use of out-of-band, lightweight calls to the web server in lieu of full-page postbacks. These asynchronous calls are initiated on the client using JavaScript and involve formatting data, sending it to a web server, and parsing and working with the returned data. While most browsers can construct, send, and parse XML, JavaScript Object Notation (or JSON) provides a standardized data exchange format that is better-suited for Ajax-style web applications. JSON is an open, text-based data exchange format (see RFC 4627). Like XML, it is human-readable, platform independent, and enjoys a wide availability of implementations. Data formatted according to the JSON standard is lightweight and can be parsed by JavaScript implementations with incredible ease, making it an ideal data exchange format for Ajax web applications. Since it is primarily a data format, JSON is not limited to just Ajax web applications, and can be used in virtually any scenario where applications need to exchange or store structured information as text. This article examines the JSON standard, its relationship to JavaScript, and how it compares to XML. Jayrock, an open-source JSON implementation for .NET, is discussed and examples of creating and parsing JSON messages are provided in JavaScript and C#.",
+        "created_at": "2016-10-29T02:24:09.225Z",
+        "title": "An Introduction to JavaScript Object Notation (JSON) in JavaScript and .NET",
+        "topic": "coding",
+        "votes": 0,
+        "comment_count": "8"
+      }
+    }
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "serves an article object with updated article content",
+    "queries": [],
+    "exampleArticlePriorPatch": {
+      "article": {
+        "article_id": 1,
+        "title": "Running a Node App",
+        "body": "This is part two of a series on how to get up and running with Systemd and Node.js. This part dives deeper into how to successfully run your app with systemd long-term, and how to set it up in a production environment.",
+        "votes": 0,
+        "topic": "coding",
+        "author": "jessjelly",
+        "created_at": "2016-08-18T12:07:52.389Z"
+      }
+    },
+    "examplePatchInput": {
+      "inc_votes": 5
+    },
+    "exampleResponse": {
+      "article": {
+        "article_id": 1,
+        "title": "Running a Node App",
+        "body": "This is part two of a series on how to get up and running with Systemd and Node.js. This part dives deeper into how to successfully run your app with systemd long-term, and how to set it up in a production environment.",
+        "votes": 5,
+        "topic": "coding",
+        "author": "jessjelly",
+        "created_at": "2016-08-18T12:07:52.389Z"
+      }
+    }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "serves a comment object with included POST content",
+    "queries": [],
+    "examplePostInput": {
+      "username": "grumpy19",
+      "body": "I loved reading this article"
+    },
+    "exampleResponse": {
+      "comment": {
+        "comment_id": 19,
+        "author": "grumpy19",
+        "article_id": 1,
+        "votes": 0,
+        "created_at": "2020-03-30T13:39:41.628Z",
+        "body": "I loved reading this article"
+      }
+    }
+  },
+  "GET /api/articles/:article_id/comments": {
+    "description": "serves an array of all comments for given article_id ",
+    "queries": ["sort_by", "order"],
+    "exampleResponse": {
+      "comments": [
+        {
+          "comment_id": 44,
+          "votes": 4,
+          "created_at": "2017-11-20T08:58:48.322Z",
+          "author": "grumpy19",
+          "body": "Error est qui id corrupti et quod enim accusantium minus. Deleniti quae ea magni officiis et qui suscipit non."
+        }
+      ]
+    }
+  },
+  "PATCH /api/comments/:comment_id": {
+    "description": "serves a comment object with updated comment",
+    "queries": [],
+    "exampleCommentPriorPatch": {
+      "comments": [
+        {
+          "comment_id": 23,
+          "votes": 2,
+          "created_at": "2017-07-14T00:30:05.991Z",
+          "author": "cooljmessy",
+          "body": "Necessitatibus ea eum error ratione sint cumque occaecati non. Dolor rem accusantium sed debitis. Dolor tempora molestias cupiditate veritatis sit sit ipsam. Aut neque et dolore laboriosam."
+        }
+      ],
+      "examplePatchInput": { "inc_votes": 10 },
+      "exampleResponse": [
+        {
+          "comment_id": 23,
+          "votes": 12,
+          "created_at": "2017-07-14T00:30:05.991Z",
+          "author": "cooljmessy",
+          "body": "Necessitatibus ea eum error ratione sint cumque occaecati non. Dolor rem accusantium sed debitis. Dolor tempora molestias cupiditate veritatis sit sit ipsam. Aut neque et dolore laboriosam."
+        }
+      ]
+    }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "serves no content when successfully deleted",
+    "queries": [],
+    "exampleResponse": ""
   }
 }
