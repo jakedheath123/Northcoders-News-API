@@ -2,6 +2,7 @@
   "GET /api": {
     "description": "serves up a json representation of all the available endpoints of the api"
   },
+
   "GET /api/topics": {
     "description": "serves an array of all topics",
     "queries": [],
@@ -9,6 +10,7 @@
       "topics": [{ "slug": "football", "description": "Footie!" }]
     }
   },
+
   "GET /api/articles": {
     "description": "serves an array of all articles",
     "queries": ["author", "topic", "sort_by", "order"],
@@ -24,6 +26,7 @@
       ]
     }
   },
+
   "GET /api/users/:username": {
     "description": "serves a user object representing information of chosen username",
     "queries": [],
@@ -35,6 +38,7 @@
       }
     }
   },
+
   "GET /api/articles/:article_id": {
     "description": "serves an article object representing information of chosen article id",
     "queries": [],
@@ -51,6 +55,7 @@
       }
     }
   },
+
   "PATCH /api/articles/:article_id": {
     "description": "serves an article object with updated article content",
     "queries": [],
@@ -80,6 +85,7 @@
       }
     }
   },
+
   "POST /api/articles/:article_id/comments": {
     "description": "serves a comment object with included POST content",
     "queries": [],
@@ -98,6 +104,7 @@
       }
     }
   },
+
   "GET /api/articles/:article_id/comments": {
     "description": "serves an array of all comments for given article_id ",
     "queries": ["sort_by", "order"],
@@ -113,6 +120,7 @@
       ]
     }
   },
+
   "PATCH /api/comments/:comment_id": {
     "description": "serves a comment object with updated comment",
     "queries": [],
@@ -138,9 +146,10 @@
       ]
     }
   },
+
   "DELETE /api/comments/:comment_id": {
-    "description": "serves no content when successfully deleted",
+    "description": "deletes a comment by comment_id and sends status code 204",
     "queries": [],
-    "exampleResponse": ""
+    "exampleResponse": "no content"
   }
 }
