@@ -48,6 +48,16 @@ describe("Northcoders News API", function() {
     return connection.seed.run();
   });
   describe("/api", function() {
+    describe("GET", function() {
+      test("Status : 200 - Responds with a JSON file of all endpoints", function() {
+        return request(app)
+          .get("/api")
+          .expect(200)
+          .then(function(endpoints) {
+            expect(typeof endpoints).toBe("object");
+          });
+      });
+    });
     describe("Invalid methods", function() {
       test("Provided invalid method", function() {
         const invalidMethods = ["delete", "put", "patch", "post"];
