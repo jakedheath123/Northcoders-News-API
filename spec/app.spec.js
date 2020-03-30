@@ -50,7 +50,7 @@ describe("Northcoders News API", function() {
   describe("/api", function() {
     describe("Invalid methods", function() {
       test("Provided invalid method", function() {
-        const invalidMethods = ["delete"];
+        const invalidMethods = ["delete", "put", "patch", "post"];
         const promiseArray = invalidMethods.map(function(method) {
           return request(app)
             [method]("/api")
