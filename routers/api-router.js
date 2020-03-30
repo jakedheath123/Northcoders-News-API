@@ -4,8 +4,12 @@ const usersRouter = require("./users-router");
 const articlesRouter = require("./articles-router");
 const commentsRouter = require("./comments-router");
 const { handle405Errors } = require("../errors/index");
+const { jsonEndpoints } = require("./json-router");
 
-apiRouter.route("/").all(handle405Errors);
+apiRouter
+  .route("/")
+  //.get(jsonEndpoints)
+  .all(handle405Errors);
 
 apiRouter.use("/topics", topicsRouter);
 apiRouter.use("/users", usersRouter);
