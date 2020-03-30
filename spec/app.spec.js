@@ -405,7 +405,6 @@ describe("Northcoders News API", function() {
             .expect(200)
             .then(function({ body: { articles } }) {
               expect(articles).toHaveLength(11);
-
               expect(articles[0].topic).toBe("mitch");
             });
         });
