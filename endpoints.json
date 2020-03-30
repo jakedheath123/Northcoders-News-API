@@ -125,25 +125,21 @@
     "description": "serves a comment object with updated comment",
     "queries": [],
     "exampleCommentPriorPatch": {
-      "comments": [
-        {
-          "comment_id": 23,
-          "votes": 2,
-          "created_at": "2017-07-14T00:30:05.991Z",
-          "author": "cooljmessy",
-          "body": "Necessitatibus ea eum error ratione sint cumque occaecati non. Dolor rem accusantium sed debitis. Dolor tempora molestias cupiditate veritatis sit sit ipsam. Aut neque et dolore laboriosam."
-        }
-      ],
+      "comments": {
+        "comment_id": 23,
+        "votes": 2,
+        "created_at": "2017-07-14T00:30:05.991Z",
+        "author": "cooljmessy",
+        "body": "Necessitatibus ea eum error ratione sint cumque occaecati non. Dolor rem accusantium sed debitis. Dolor tempora molestias cupiditate veritatis sit sit ipsam. Aut neque et dolore laboriosam."
+      },
       "examplePatchInput": { "inc_votes": 10 },
-      "exampleResponse": [
-        {
-          "comment_id": 23,
-          "votes": 12,
-          "created_at": "2017-07-14T00:30:05.991Z",
-          "author": "cooljmessy",
-          "body": "Necessitatibus ea eum error ratione sint cumque occaecati non. Dolor rem accusantium sed debitis. Dolor tempora molestias cupiditate veritatis sit sit ipsam. Aut neque et dolore laboriosam."
-        }
-      ]
+      "exampleResponse": {
+        "comment_id": 23,
+        "votes": 12,
+        "created_at": "2017-07-14T00:30:05.991Z",
+        "author": "cooljmessy",
+        "body": "Necessitatibus ea eum error ratione sint cumque occaecati non. Dolor rem accusantium sed debitis. Dolor tempora molestias cupiditate veritatis sit sit ipsam. Aut neque et dolore laboriosam."
+      }
     }
   },
 
