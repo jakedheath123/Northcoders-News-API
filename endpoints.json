@@ -4,7 +4,7 @@
   },
 
   "GET /api/topics": {
-    "description": "serves an array of all topics",
+    "description": "serves an object containing an array of all topics on a key of topics",
     "queries": [],
     "exampleResponse": {
       "topics": [{ "slug": "football", "description": "Footie!" }]
@@ -12,7 +12,7 @@
   },
 
   "GET /api/articles": {
-    "description": "serves an array of all articles",
+    "description": "serves an object containing an array of all articles on a key of articles",
     "queries": ["author", "topic", "sort_by", "order"],
     "exampleResponse": {
       "articles": [
@@ -28,7 +28,7 @@
   },
 
   "GET /api/users/:username": {
-    "description": "serves a user object representing information of chosen username",
+    "description": "serves an object containing an object representing information of chosen username on a key of user",
     "queries": [],
     "exampleResponse": {
       "user": {
@@ -40,7 +40,7 @@
   },
 
   "GET /api/articles/:article_id": {
-    "description": "serves an article object representing information of chosen article id",
+    "description": "serves an object containing an object representing information of chosen article id on a key of article",
     "queries": [],
     "exampleResponse": {
       "article": {
@@ -57,20 +57,9 @@
   },
 
   "PATCH /api/articles/:article_id": {
-    "description": "serves an article object with updated article content",
+    "description": "serves an object containing an object with updated article content on a key of article",
     "queries": [],
-    "exampleArticlePriorPatch": {
-      "article": {
-        "article_id": 1,
-        "title": "Running a Node App",
-        "body": "This is part two of a series on how to get up and running with Systemd and Node.js. This part dives deeper into how to successfully run your app with systemd long-term, and how to set it up in a production environment.",
-        "votes": 0,
-        "topic": "coding",
-        "author": "jessjelly",
-        "created_at": "2016-08-18T12:07:52.389Z"
-      }
-    },
-    "examplePatchInput": {
+    "exampleRequest": {
       "inc_votes": 5
     },
     "exampleResponse": {
@@ -87,9 +76,9 @@
   },
 
   "POST /api/articles/:article_id/comments": {
-    "description": "serves a comment object with included POST content",
+    "description": "serves an object containing an object with included POST content on a key of comment",
     "queries": [],
-    "examplePostInput": {
+    "exampleRequest": {
       "username": "grumpy19",
       "body": "I loved reading this article"
     },
@@ -106,7 +95,7 @@
   },
 
   "GET /api/articles/:article_id/comments": {
-    "description": "serves an array of all comments for given article_id ",
+    "description": "serves an object containing an array of all comments for given article_id on a key of comments ",
     "queries": ["sort_by", "order"],
     "exampleResponse": {
       "comments": [
@@ -122,18 +111,11 @@
   },
 
   "PATCH /api/comments/:comment_id": {
-    "description": "serves a comment object with updated comment",
+    "description": "serves an object containing an object with updated comment on a key of comment",
     "queries": [],
-    "exampleCommentPriorPatch": {
-      "comments": {
-        "comment_id": 23,
-        "votes": 2,
-        "created_at": "2017-07-14T00:30:05.991Z",
-        "author": "cooljmessy",
-        "body": "Necessitatibus ea eum error ratione sint cumque occaecati non. Dolor rem accusantium sed debitis. Dolor tempora molestias cupiditate veritatis sit sit ipsam. Aut neque et dolore laboriosam."
-      },
-      "examplePatchInput": { "inc_votes": 10 },
-      "exampleResponse": {
+    "exampleRequest": { "inc_votes": 10 },
+    "exampleResponse": {
+      "comment": {
         "comment_id": 23,
         "votes": 12,
         "created_at": "2017-07-14T00:30:05.991Z",
@@ -144,8 +126,8 @@
   },
 
   "DELETE /api/comments/:comment_id": {
-    "description": "deletes a comment by comment_id and sends status code 204",
+    "description": "serves an empty object and sends status code 204",
     "queries": [],
-    "exampleResponse": "no content"
+    "exampleResponse": {}
   }
 }
