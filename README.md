@@ -104,6 +104,7 @@ npm run test-utils
 - [PostgreSQL](https://www.postgresql.org/)
 - [Jest](https://jestjs.io/)
 - [SuperTest](https://www.npmjs.com/package/supertest)
+- [Heroku](https://www.heroku.com/)
 
 ## Links
 Please click here for deployed API: [Heroku](https://nc-news-be-project.herokuapp.com/api)
