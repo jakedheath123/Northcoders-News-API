@@ -1,4 +1,4 @@
-# Back End Northcoders News API
+# Northcoders News API
 
 ## Overview
 An Express server conforming to RESTful architectural style, to be used to interact and provide data to my Northcoders News Front End project. This project uses an SQL database that interacts with Postgres. Knex has been used to build the available queries.
